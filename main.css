@@ -1,0 +1,33 @@
+body {
+    background-color: #222;
+}
+
+#main {
+    width: 600px;
+    height: 500px;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: auto;
+}
+
+#snake {
+    width: 600px;
+    height: 450px;
+    background-color: black;
+}
+
+#gameinfo span {
+    display: block;
+    margin: 0px 0px 20px 0px;
+    color: rgb(106, 181, 88);
+    font-size: 1.8em;
+    font-family: monospace;
+}
+
+#gamekeys {
+    color: #555;
+    text-align: right;
+}
