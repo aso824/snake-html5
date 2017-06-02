@@ -22,53 +22,54 @@ function Game(ctx, width = 20, height = 15) {
     this.direction = 'left';
     this.length = 3;
 
-    // Map object
-    var map = [];
+    var snake = [];
+    var foodPos = [];
 
-    this.initMap = function() {
-        // Clear map array
-        map = [];
-
-        // Fill with 0
-        for (var i = 0; i < height; i++) {
-            map[i] = [];
-
-            for (var j = 0; j < width; j++)
-                map[i][j] = 0;
-        }
-    }
-
-    // Place snake
     this.createSnake = function() {
-        map[Math.floor(height/2)][Math.floor(width/2)] = 2;
-        map[Math.floor(height/2)][Math.floor(width/2 + 1)] = 1;
-        map[Math.floor(height/2)][Math.floor(width/2 + 2)] = 1;
+        // Reset existing segments
+        snake = [];
+
+        // Center of the screen
+        var w = Math.floor(width/2);
+        var h = Math.floor(height/2);
+
+        // Add 3 segments
+        snake.push(
+            [w, h],
+            [w + 1, h],
+            [w + 2, h]
+        );
     }
 
     this.updatePoints = function() {
         $('#gamepoints').html('Points: ' + this.points);
     }
 
+    this.drawFood = function() {
+        ctx.fillStyle = '#d74626';
+
+        var x = foodPos[0];
+        var y = foodPos[1];
+
+        ctx.arc(x * this.tileSize + this.tileSize / 2, y * this.tileSize + this.tileSize / 2, this.tileSize / 4, 0, 2 * Math.PI, false);
+        ctx.fill();
+    }
+
     this.redrawGfx = function() {
-        // Iterate over whole map
-        for (var y = 0; y < height; y++) {
-            for (var x = 0; x < width; x++) {
-                if (map[y][x] == 1) {
-                    // Draw snake segment
-                    ctx.fillStyle = '#6ab558';
-                    ctx.fillRect(x * this.tileSize, y * this.tileSize, this.tileSize, this.tileSize);
-                } else if (map[y][x] == 2) {
-                    // Draw snake head
-                    ctx.fillStyle = '#b1d5a8';
-                    ctx.fillRect(x * this.tileSize, y * this.tileSize, this.tileSize, this.tileSize);
-                } else if (map[y][x] == 3) {
-                    // Draw food
-                    ctx.fillStyle = '#d74626';
-                    ctx.arc(x * this.tileSize + this.tileSize / 2, y * this.tileSize + this.tileSize / 2, this.tileSize / 4, 0, 2 * Math.PI, false);
-                    ctx.fill();
-                }
-            }
+        // Iterate over snake segments
+        for (var i in snake) {
+            if (i == 0)
+                ctx.fillStyle = '#b1d5a8';
+            else
+                ctx.fillStyle = '#6ab558';
+
+            var x = snake[i][0];
+            var y = snake[i][1];
+            ctx.fillRect(x * this.tileSize, y * this.tileSize, this.tileSize, this.tileSize);
         }
+
+        // Draw food
+        this.drawFood();
     }
 
     this.newFood = function() {
@@ -77,19 +78,30 @@ function Game(ctx, width = 20, height = 15) {
             return false;
 
         // Repeat until find free space
-        while (true) {
-            var px = Math.floor(Math.random() * width);
-            var py = Math.floor(Math.random() * height);
+        var px;
+        var py;
+        var loop;
 
-            if (map[py][px] == 0) {
-                map[py][px] = 3;
-                return [px, py];
+        do {
+            loop = false;
+
+            px = Math.floor(Math.random() * width);
+            py = Math.floor(Math.random() * height);
+
+            for (var i in snake) {
+                if (snake[i][0] == px && snake[i][1] == py) {
+                    loop = true;
+                    break;
+                }
             }
-        }
+
+        } while(loop);
+
+        foodPos = [px, py];
+        return foodPos;
     }
 
     this.start = function() {
-        this.initMap();
         this.createSnake();
         this.newFood();
         this.redrawGfx();
