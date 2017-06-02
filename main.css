@@ -17,6 +17,7 @@ body {
     width: 600px;
     height: 450px;
     background-color: black;
+    border: 2px solid rgb(106, 181, 88);
 }
 
 #gameinfo span {
