@@ -24,6 +24,7 @@ function Game(ctx, width = 20, height = 15) {
 
     var snake = [];
     var foodPos = [];
+    var timer;
 
     this.createSnake = function() {
         // Reset existing segments
@@ -56,6 +57,10 @@ function Game(ctx, width = 20, height = 15) {
     }
 
     this.redrawGfx = function() {
+        // Clear screen
+        ctx.fillStyle = '#000000';
+        ctx.fillRect(0, 0, this.screenW, this.screenH);
+
         // Iterate over snake segments
         for (var i in snake) {
             if (i == 0)
@@ -101,10 +106,30 @@ function Game(ctx, width = 20, height = 15) {
         return foodPos;
     }
 
+    this.makeMove = function() {
+        // Add new element on front
+        snake.unshift([snake[0][0] - 1, snake[0][1]]);
+
+        // Remove last snake element
+        snake.pop();
+
+        // Redraw
+        this.redrawGfx();
+
+        // Recall
+        timer = setTimeout(function() { this.makeMove() }.bind(this), this.speed);
+    }
+
+    this.startMoving = function() {
+        var that = this;
+        timer = setTimeout(function() { this.makeMove(); }.bind(this), this.speed);
+    }
+
     this.start = function() {
         this.createSnake();
         this.newFood();
         this.redrawGfx();
+        this.startMoving();
     }
 }
 
