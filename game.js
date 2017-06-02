@@ -20,6 +20,7 @@ function Game(ctx, width = 20, height = 15) {
     // Game variables
     this.speed = 800;
     this.direction = 'left';
+    this.newDirection = this.direction;
     this.length = 3;
 
     var snake = [];
@@ -107,8 +108,20 @@ function Game(ctx, width = 20, height = 15) {
     }
 
     this.makeMove = function() {
+        // Calculate new head position
+        var pos = [ snake[0][0] , snake[0][1] ];
+
+        this.direction = this.newDirection;
+        switch (this.direction) {
+            case 'up': pos[1] -= 1; break;
+            case 'down': pos[1] += 1; break;
+            case 'left': pos[0] -= 1; break;
+            case 'right': pos[0] += 1; break;
+            default: break;
+        }
+
         // Add new element on front
-        snake.unshift([snake[0][0] - 1, snake[0][1]]);
+        snake.unshift(pos);
 
         // Remove last snake element
         snake.pop();
@@ -121,14 +134,34 @@ function Game(ctx, width = 20, height = 15) {
     }
 
     this.startMoving = function() {
-        var that = this;
         timer = setTimeout(function() { this.makeMove(); }.bind(this), this.speed);
     }
 
+    this.keypressed = function(e) {
+        if (e.keyCode == 38 && this.direction != 'down')
+            this.newDirection = 'up';
+        else if (e.keyCode == 39 && this.direction != 'left')
+            this.newDirection = 'right';
+        else if (e.keyCode == 40 && this.direction != 'up')
+            this.newDirection = 'down';
+        else if (e.keyCode == 37 && this.direction != 'right')
+            this.newDirection = 'left';
+    }
+
     this.start = function() {
+        // Create snake
         this.createSnake();
+
+        // Create new food in random place
         this.newFood();
+
+        // Initial draw
         this.redrawGfx();
+
+        // Register keyboard hook
+        document.addEventListener('keydown', function(e) { this.keypressed(e); }.bind(this));
+
+        // Start ticking
         this.startMoving();
     }
 }
